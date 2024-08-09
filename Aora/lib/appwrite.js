@@ -1,4 +1,6 @@
-export const appwriteConfig={
+import { Account,Avatars,Client,Databases,ID } from 'react-native-appwrite';
+
+export const Config={
     endpoint:'https://cloud.appwrite.io/v1',
     platform:'com.likhith.aora_app',
     projectId:'66a63ebf00396f4cf7ae',
@@ -7,3 +9,60 @@ export const appwriteConfig={
     videoCollectionId:'66a64131000ac009afdc',
     storageId:'66a643a300347eb258cc'
 }
+
+
+// Init your React Native SDK
+const client = new Client();
+
+client
+    .setEndpoint(Config.endpoint) // Your Appwrite Endpoint
+    .setProject(Config.projectId) // Your project ID
+    .setPlatform(Config.platform) // Your application ID or bundle ID.
+;
+
+
+const account = new Account(client);
+const avatars = new Avatars(client);
+const databases = new Databases(client)
+
+
+
+export const  createUser = async (email,password,username)=>{
+    // Register User
+    try {
+        const newAccount= await account.create(ID.unique(),email,password,username)
+        if(!newAccount) throw new Error
+
+        const avatarUrl = avatars.getInitials(username)
+        await signin(email,password)
+        const newUser = databases.createDocument(
+            Config.databaseId,
+            Config.userCollectionId,
+            ID.unique(),
+            {
+                accountid:newAccount.$id,
+                email,
+                password,
+                username,
+                avatar:avatarUrl
+            }
+        )
+        console.log('new user---',newUser)
+        return newUser
+
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
+export const signin= async(email,password)=>{
+    try {
+        const session = await account.createEmailPasswordSession(email,password)
+        return session
+    } catch (error) {
+        console.log(error)
+        throw new Error(error)
+    }
+}
+
