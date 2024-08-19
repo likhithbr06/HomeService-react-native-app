@@ -96,3 +96,22 @@ export const getAllPosts =async()=>{
         
     }
 }
+export const getLatestPosts =async()=>{
+    try {
+        const posts = await databases.listDocuments(Config.databaseId, Config.videoCollectionId,[Query.orderDesc('$createdAt',Query.limit(7))])
+        return posts.documents
+        
+    } catch (error) {
+        
+    }
+}
+export const searchPosts =async(query)=>{
+    try {
+        const posts = await databases.listDocuments(Config.databaseId, Config.videoCollectionId,[Query.orderDesc('$createdAt',Query.limit(7))])
+        return posts.documents
+        
+    } catch (error) {
+        
+    }
+}
+
